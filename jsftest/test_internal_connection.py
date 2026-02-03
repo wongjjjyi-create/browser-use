@@ -11,7 +11,7 @@ import asyncio
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from browser_use.llm.deepseek.chat import ChatDeepSeek
-from browser_use.llm.messages import SystemMessage, HumanMessage
+from browser_use.llm.messages import SystemMessage, UserMessage
 
 async def test_connection():
     """测试与公司内部 DeepSeek 模型的连接"""
@@ -20,23 +20,20 @@ async def test_connection():
     
     # 配置公司内部 DeepSeek 模型
     llm = ChatDeepSeek(
-        model='deepseek-chat',
-        api_key=os.getenv('DEEPSEEK_API_KEY', 'c18c900019834d6b8da93bfee69cbc31'),
-        base_url=os.getenv('DEEPSEEK_BASE_URL', 'http://easyalgo.jd.com/openapi/deepseek'),
+        model='DeepSeek-V3',
+        api_key= 'c18c900019834d6b8da93bfee69cbc31',
+        base_url='http://easyalgo.jd.com/openapi/deepseek/v1',
         temperature=0.7,
         max_tokens=1000,
         timeout=60.0,
     )
-    
-    print(f"📡 API 端点: {os.getenv('DEEPSEEK_BASE_URL', 'http://easyalgo.jd.com/openapi/deepseek')}")
-    print(f"🔑 API 密钥: {'✅ 已设置' if os.getenv('DEEPSEEK_API_KEY') else '❌ 未设置'}")
-    print(f"🤖 模型: deepseek-chat")
+  
     
     try:
         # 创建测试消息
         messages = [
             SystemMessage(content="你是一个友好的助手，请用中文回复。"),
-            HumanMessage(content="你好，请介绍一下你自己。")
+            UserMessage(content="你好，请介绍一下你自己。")
         ]
         
         print("🔄 正在发送测试请求...")
@@ -70,29 +67,10 @@ async def test_connection():
         
         return False
 
-def validate_environment():
-    """验证环境配置"""
-    api_key = os.getenv('DEEPSEEK_API_KEY')
-    base_url = os.getenv('DEEPSEEK_BASE_URL')
-    
-    print("🔍 环境配置检查:")
-    print(f"   DEEPSEEK_API_KEY: {'✅ 已设置' if api_key else '❌ 未设置'}")
-    print(f"   DEEPSEEK_BASE_URL: {base_url or '❌ 未设置'}")
-    
-    if not api_key:
-        print("⚠️  警告: DEEPSEEK_API_KEY 未设置，将使用默认值")
-    
-    if not base_url:
-        print("⚠️  警告: DEEPSEEK_BASE_URL 未设置，将使用默认值")
-    
-    return True
-
 if __name__ == "__main__":
     print("🤖 公司内部 DeepSeek 模型连接测试")
     print("=" * 50)
     
-    # 验证环境
-    validate_environment()
     
     print("\n" + "=" * 50)
     

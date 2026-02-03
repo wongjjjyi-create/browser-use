@@ -19,11 +19,23 @@ from browser_use.llm.deepseek.chat import ChatDeepSeek
 async def main():
     """主函数：执行浏览器自动化测试"""
     
+    # 验证环境变量
+    api_key = 'c18c900019834d6b8da93bfee69cbc31'
+    base_url = 'http://easyalgo.jd.com/openapi/deepseek/v1'
+    
+    if not api_key:
+        print("❌ 错误: DEEPSEEK_API_KEY 环境变量未设置")
+        print("请设置环境变量: export DEEPSEEK_API_KEY='your-api-key'")
+        return
+    
+    print(f"✅ API密钥: 已设置")
+    print(f"✅ API端点: {base_url}")
+    
     # 配置公司内部 DeepSeek 模型
     llm = ChatDeepSeek(
-        model='deepseek-chat',  # 使用标准模型名称
-        api_key=os.getenv('DEEPSEEK_API_KEY', 'c18c900019834d6b8da93bfee69cbc31'),
-        base_url=os.getenv('DEEPSEEK_BASE_URL', 'http://easyalgo.jd.com/openapi/deepseek'),
+        model= 'DeepSeek-V3',  # 使用环境变量中的模型名称
+        api_key=api_key,
+        base_url=base_url,
         temperature=0.7,
         max_tokens=2000,
         timeout=120.0,
@@ -31,7 +43,7 @@ async def main():
 
     # 配置浏览器
     browser = Browser(
-        headless=False,  # 可视化模式便于调试
+        headless=True,  # 可视化模式便于调试
         disable_security=True,  # 禁用安全限制
     )
 
@@ -42,12 +54,15 @@ async def main():
 
     # 定义任务步骤
     task = (
-        f"Step 1: Navigate exactly to this URL without any modification:\n{full_url}\n\n"
+         f"Step 1: Navigate exactly to this URL without any modification:\n{full_url}\n\n"
         "Step 2: 在这个配置页面点击新增\n"
-        "Step 3: 接口名输入com.jd.jsf.service.DemoService进行检索并选中，别名填入JSF-COPPER-SIDECAR进行检索并选中，方法填入sayHello进行检索并选中，其他配置用默认值\n"
-        "Step 4: 点击提交\n"
-        "Step 5: 点击查询\n"
-        "Step 6: 查询到的结果中，选择第一个，将操作的开关打开并提交开启\n"
+        "Step 3: 接口名输入com.jd.jsf.service.DemoService进行检索，等待数据加载完毕后,可以下拉下拉列表来查找选中,要求必须精确匹配\n"
+        "Step 4: 别名填入JSF-COPPER-SIDECAR进行检索,等待数据加载完毕后,可以下拉下拉列表来查找选中,要求必须精确匹配\n"
+        "Step 5:方法填入sayHello进行检索,等待数据加载完毕后,可以下拉下拉列表来查找选中,要求必须精确匹配\n"
+        "Step 6:其他配置用默认值\n"
+        "Step 7: 点击提交\n"
+        "Step 8: 点击查询\n"
+        "Step 9: 查询到的结果中，选择第一个，将操作的开关打开并提交开启\n"
     )
 
     try:
@@ -100,29 +115,10 @@ async def main():
         except Exception as e:
             print(f"❌ HTTP 请求异常: {e}")
 
-def validate_config():
-    """验证配置"""
-    api_key = os.getenv('DEEPSEEK_API_KEY')
-    base_url = os.getenv('DEEPSEEK_BASE_URL')
-    
-    print("🔍 验证配置...")
-    print(f"   API 密钥: {'✅ 已设置' if api_key else '❌ 未设置'}")
-    print(f"   基础 URL: {base_url or 'http://easyalgo.jd.com/openapi/deepseek'}")
-    
-    if not api_key:
-        print("⚠️  请确保设置了 DEEPSEEK_API_KEY 环境变量")
-        return False
-    
-    return True
 
 if __name__ == "__main__":
     print("🤖 使用公司内部 DeepSeek 模型执行浏览器自动化测试")
     print("=" * 60)
-    
-    # 验证配置
-    if not validate_config():
-        print("❌ 配置验证失败，请检查环境变量")
-        exit(1)
     
     # 运行主程序
     asyncio.run(main())
